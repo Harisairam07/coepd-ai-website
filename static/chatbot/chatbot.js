@@ -127,7 +127,7 @@
     if (!payload.name || !payload.email || !payload.phone) return;
 
     try {
-      await fetch((window.__API_BASE__ || "") + "/contact", {
+      await fetch((window.__API_BASE__ || "") + "/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),

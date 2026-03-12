@@ -228,17 +228,22 @@
       };
 
       try {
-        const res = await fetch((window.__API_BASE__ || "") + "/contact", {
+        const res = await fetch((window.__API_BASE__ || "") + "/enquiry", {
           method: "POST",
           headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        msg.textContent = "Thanks! Our team will contact you within 24 hours.";
+        if (!res.ok) {
+          const errBody = await res.text().catch(() => "");
+          throw new Error("HTTP " + res.status + ": " + errBody);
+        }
+        const data = await res.json().catch(() => ({}));
+        msg.textContent = data.message || "Thanks! Our team will contact you within 24 hours.";
         msg.style.color = "#10B981";
         form.reset();
         clearErrors();
-      } catch (_err) {
+      } catch (err) {
+        console.error("Contact form error:", err);
         msg.textContent = "Unable to submit right now. Please try again.";
         msg.style.color = "#dc2626";
       }

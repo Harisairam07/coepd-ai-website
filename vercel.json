@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": "https://coepd-backend.onrender.com/$1"
+      "destination": "https://coepd-ai-website.onrender.com/$1"
     }
   ]
 }
