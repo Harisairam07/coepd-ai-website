@@ -6,3 +6,4 @@ itsdangerous
 starlette
 aiofiles
 pydantic
+python-jose[cryptography]
