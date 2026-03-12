@@ -1,6 +1,7 @@
 import calendar
 import csv
 import json
+import os
 import sqlite3
 import threading
 from contextlib import contextmanager
@@ -13,7 +14,11 @@ _IST = timezone(timedelta(hours=5, minutes=30))
 import bcrypt
 
 
-DB_PATH = Path(__file__).resolve().parent / "app.db"
+# On Vercel, the filesystem is read-only except /tmp
+if os.environ.get("VERCEL"):
+    DB_PATH = Path("/tmp/app.db")
+else:
+    DB_PATH = Path(__file__).resolve().parent / "app.db"
 _LOCAL = threading.local()
 
 _TS_FORMATS = (

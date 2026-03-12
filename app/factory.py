@@ -86,42 +86,41 @@ def create_app() -> FastAPI:
 
     app.add_middleware(AuthAndSecurityMiddleware)
 
+    _allowed_origins = [
+        "https://coepd-ai-website.vercel.app",
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
+    ]
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=False,
+        allow_origins=_allowed_origins,
+        allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
     app.middleware("http")(RateLimiter(limit_per_minute=90))
 
-    @app.on_event("startup")
-    async def startup_event():
-        warnings = _run_startup_checks()
+    # Eagerly initialise the database so it works on Vercel serverless
+    # where the ASGI "startup" lifespan event may never fire.
+    _run_startup_checks()
+    try:
+        init_db()
+        app.state.startup_status["database"] = "connected"
+        logger.info("Database initialized")
+    except Exception as exc:
+        app.state.startup_status["database"] = "disconnected"
+        logger.exception("Database initialization failed: %s", exc)
 
-        for warning in warnings:
-            logger.warning("Startup warning: %s", warning)
-        if warnings:
-            app.state.startup_status["auth"] = "degraded"
+    admin_email = (os.getenv("ADMIN_LOGIN_EMAIL") or "admin@coepd.com").strip()
+    admin_password = (os.getenv("ADMIN_LOGIN_PASSWORD") or "admin123").strip()
+    try:
+        seed_default_admin_user(email=admin_email, password=admin_password, name="Admin")
+    except Exception as exc:
+        logger.warning("Unable to seed default admin user: %s", exc)
 
-        try:
-            init_db()
-            app.state.startup_status["database"] = "connected"
-            logger.info("Database initialized")
-        except Exception as exc:
-            app.state.startup_status["database"] = "disconnected"
-            logger.exception("Database initialization failed: %s", exc)
-
-        admin_email = (os.getenv("ADMIN_LOGIN_EMAIL") or "admin@coepd.com").strip()
-        admin_password = (os.getenv("ADMIN_LOGIN_PASSWORD") or "admin123").strip()
-        try:
-            seed_default_admin_user(email=admin_email, password=admin_password, name="Admin")
-        except Exception as exc:
-            logger.warning("Unable to seed default admin user: %s", exc)
-
-        logger.info("Authentication enabled")
-        logger.info("Application startup complete")
+    logger.info("Authentication enabled")
+    logger.info("Application startup complete")
 
     app.include_router(register_page_routes(templates))
     app.include_router(register_auth_routes(templates))
