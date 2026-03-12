@@ -110,3 +110,9 @@ async def contact(payload: ContactPayload):
     except Exception as exc:
         logger.exception("/contact failed")
         raise HTTPException(status_code=500, detail="Unable to store contact lead") from exc
+
+
+@router.post("/enquiry")
+async def enquiry(payload: ContactPayload):
+    """Alias for /contact — used by some frontend deployments."""
+    return await contact(payload)

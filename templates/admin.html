@@ -186,6 +186,11 @@
   </div>
 
   <script>
+    window.__API_BASE__ = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+      ? ""
+      : "https://coepd-backend.onrender.com";
+  </script>
+  <script>
     window.__ADMIN_CONTEXT__ = {
       role: "{{ current_user.role }}",
       csrfToken: "{{ csrf_token }}",

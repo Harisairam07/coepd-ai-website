@@ -228,7 +228,7 @@
       };
 
       try {
-        const res = await fetch("/contact", {
+        const res = await fetch((window.__API_BASE__ || "") + "/contact", {
           method: "POST",
           headers: { "Content-Type": "application/json", Accept: "application/json" },
           body: JSON.stringify(payload),

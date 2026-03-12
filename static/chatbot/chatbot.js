@@ -127,7 +127,7 @@
     if (!payload.name || !payload.email || !payload.phone) return;
 
     try {
-      await fetch("/contact", {
+      await fetch((window.__API_BASE__ || "") + "/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
@@ -150,7 +150,7 @@
     const typingEl = appendMessage("bot", "", true);
 
     try {
-      const response = await fetch("/chat", {
+      const response = await fetch((window.__API_BASE__ || "") + "/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: message.trim(), user_id: state.userId }),

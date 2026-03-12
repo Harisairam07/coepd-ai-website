@@ -124,9 +124,11 @@ function updatePager() {
 }
 
 async function fetchJson(url, fallbackErrorMessage, options = {}) {
+  const fullUrl = (window.__API_BASE__ || "") + url;
   const requestOptions = {
     headers: { Accept: "application/json", ...(options.headers || {}) },
     cache: "no-store",
+    credentials: "include",
     ...options,
   };
 
@@ -136,7 +138,7 @@ async function fetchJson(url, fallbackErrorMessage, options = {}) {
   }
 
   try {
-    const response = await fetch(url, requestOptions);
+    const response = await fetch(fullUrl, requestOptions);
     if (response.status === 401) {
       window.location.href = "/admin";
       throw new Error("UNAUTHORIZED");

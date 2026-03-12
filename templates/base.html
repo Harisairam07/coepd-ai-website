@@ -126,6 +126,11 @@
   <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
   <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script>
+    window.__API_BASE__ = (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+      ? ""
+      : "https://coepd-backend.onrender.com";
+  </script>
   <script src="/static/script.js?v=3"></script>
   <script src="/chatbot/chatbot.js?v=3"></script>
 </body>

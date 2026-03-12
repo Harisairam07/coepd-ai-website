@@ -14,7 +14,7 @@ _IST = timezone(timedelta(hours=5, minutes=30))
 import bcrypt
 
 
-# On Vercel, the filesystem is read-only except /tmp
+# On Vercel/serverless, the filesystem is read-only except /tmp
 if os.environ.get("VERCEL"):
     DB_PATH = Path("/tmp/app.db")
 else:

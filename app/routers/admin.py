@@ -42,6 +42,18 @@ async def admin_leads(
         raise HTTPException(status_code=500, detail="Unable to fetch leads") from exc
 
 
+@router.get("/staff/leads")
+async def staff_leads(
+    date: str | None = None,
+    source: str | None = None,
+    search: str | None = None,
+    interested_domain: str | None = None,
+    _user: dict = Depends(require_roles("admin", "staff")),
+):
+    """Alias for /admin/leads — accessible to staff panel."""
+    return await admin_leads(date=date, source=source, search=search, interested_domain=interested_domain, _user=_user)
+
+
 @router.delete("/admin/leads/{lead_id}")
 async def delete_admin_lead(lead_id: int, _user: dict = Depends(require_roles("admin"))):
     try:
