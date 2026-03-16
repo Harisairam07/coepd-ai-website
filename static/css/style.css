@@ -1668,6 +1668,7 @@ section{ position:relative; z-index:1; margin-top:0; }
 .glass-card--hostel .card-icon-wrap--benefit { background: rgba(79,70,229,.08); color: var(--primary); }
 .glass-card--discount .card-icon-wrap--benefit { background: rgba(245,158,11,.08); color: #f59e0b; }
 .benefit-card:hover .card-icon-wrap--benefit { transform: scale(1.08) rotate(-3deg); }
+<<<<<<< HEAD
 .benefit-emoji {
   display: inline-flex;
   align-items: center;
@@ -1675,6 +1676,8 @@ section{ position:relative; z-index:1; margin-top:0; }
   font-size: 24px;
   line-height: 1;
 }
+=======
+>>>>>>> 11d59141a8029ea48204adb46857c682045bffa9
 .card-badge--green {
   background: rgba(34,197,94,.1); color: var(--accent-dark);
 }
@@ -3871,6 +3874,7 @@ main.page{
     width: 32px;
   }
 }
+<<<<<<< HEAD
 
 /* Hiring partners premium section upgrade */
 #hiring-partners.section {
@@ -4134,3 +4138,5 @@ main.page{
     min-height: 34px;
   }
 }
+=======
+>>>>>>> 11d59141a8029ea48204adb46857c682045bffa9
