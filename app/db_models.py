@@ -1,7 +1,7 @@
 from datetime import datetime, timezone, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from sqlalchemy import Column, DateTime, Integer, String, Text, func
+from sqlalchemy import Column, DateTime, Integer, String, func
 
 from app.database import Base
 
@@ -14,13 +14,25 @@ except ZoneInfoNotFoundError:
 
 
 def get_ist_now() -> datetime:
-    """Return the current time in IST (Asia/Kolkata)."""
-    return datetime.now(IST)
+    """Return current UTC time as naive datetime for DB storage compatibility."""
+    return datetime.utcnow()
 
 
 def to_ist(dt: datetime | None) -> datetime | None:
     """Convert any datetime to IST. Returns None if input is None."""
     if dt is None:
+        return None
+    if isinstance(dt, str):
+        raw = dt.strip()
+        if not raw:
+            return None
+        try:
+            # Support ISO8601 strings, including trailing 'Z'.
+            parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        dt = parsed
+    elif not isinstance(dt, datetime):
         return None
     if dt.tzinfo is None:
         dt = dt.replace(tzinfo=timezone.utc)
@@ -40,14 +52,14 @@ class Lead(Base):
     __tablename__ = "leads"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(Text)
-    phone = Column(Text)
-    email = Column(Text)
-    location = Column(Text)
-    interested_domain = Column(Text)
-    whatsapp = Column(Text)
-    source = Column(Text)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    name = Column(String(255))
+    phone = Column(String(50))
+    email = Column(String(255))
+    location = Column(String(255))
+    interested_domain = Column(String(255))
+    whatsapp = Column(String(50))
+    source = Column(String(50))
+    created_at = Column(DateTime(timezone=False), server_default=func.now())
 
 
 class Staff(Base):
@@ -59,4 +71,4 @@ class Staff(Base):
     password_hash = Column(String(255), nullable=False)
     role = Column(String(20), nullable=False, default="staff")
     status = Column(String(20), nullable=False, default="active")
-    created_at = Column(DateTime(timezone=True), default=get_ist_now, server_default=func.now(), nullable=False)
+    created_at = Column(DateTime(timezone=False), default=get_ist_now, server_default=func.now(), nullable=False)

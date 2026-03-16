@@ -264,7 +264,14 @@
           const errBody = await res.text().catch(() => "");
           throw new Error("HTTP " + res.status + ": " + errBody);
         }
+        const contentType = String(res.headers.get("content-type") || "").toLowerCase();
+        if (!contentType.includes("application/json")) {
+          throw new Error("Non-JSON response received");
+        }
         const data = await res.json().catch(() => ({}));
+        if (!data || data.ok !== true || !data.id) {
+          throw new Error("Lead save was not acknowledged by backend");
+        }
         msg.textContent = data.message || "Thanks! Our team will contact you within 24 hours.";
         msg.style.color = "#10B981";
         form.reset();

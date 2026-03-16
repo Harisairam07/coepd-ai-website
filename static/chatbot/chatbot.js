@@ -114,7 +114,7 @@
   }
 
   async function submitLeadPayload(leadPayload) {
-    if (!leadPayload || typeof leadPayload !== "object") return;
+    if (!leadPayload || typeof leadPayload !== "object") return false;
     const payload = {
       name: String(leadPayload.name || "").trim(),
       phone: String(leadPayload.phone || "").trim(),
@@ -126,16 +126,22 @@
       created_at: new Date().toISOString(),
     };
 
-    if (!payload.name || !payload.email || !payload.phone) return;
+    if (!payload.name || !payload.email || !payload.phone) return false;
 
     try {
-      await fetch((window.__API_BASE__ || "") + "/lead", {
+      const res = await fetch((window.__API_BASE__ || "") + "/lead", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify(payload),
       });
+      if (!res.ok) return false;
+      const contentType = String(res.headers.get("content-type") || "").toLowerCase();
+      if (!contentType.includes("application/json")) return false;
+      const data = await res.json().catch(() => ({}));
+      return Boolean(data && data.ok === true && data.id);
     } catch (_err) {
       // Keep chat UX non-blocking even if lead sync fails.
+      return false;
     }
   }
 
@@ -170,7 +176,13 @@
       if (typingEl) typingEl.remove();
       appendMessage("bot", botText);
       if (data.lead_payload) {
-        await submitLeadPayload(data.lead_payload);
+        const saved = await submitLeadPayload(data.lead_payload);
+        if (!saved) {
+          appendMessage(
+            "bot",
+            "We could not save your details right now. Please share once again or submit via the contact form."
+          );
+        }
       }
       setOptions(data.options || []);
       setProgress(data.meta && typeof data.meta.progress === "number" ? data.meta.progress : 0);

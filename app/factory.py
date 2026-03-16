@@ -118,14 +118,14 @@ def create_app() -> FastAPI:
     except Exception as exc:
         logger.warning("Chatbot DB init skipped: %s", exc)
 
-    # ── Initialise Supabase PostgreSQL ───────────────────────────────────
+    # ── Initialise SQL Server tables/users ───────────────────────────────────
     try:
         from app.database import create_tables, SessionLocal
         from app.db_models import Staff
 
         create_tables()
         app.state.startup_status["database"] = "connected"
-        logger.info("PostgreSQL tables created")
+        logger.info("SQL Server tables created")
 
         # Seed default admin user
         import bcrypt
@@ -157,7 +157,7 @@ def create_app() -> FastAPI:
 
     except Exception as exc:
         app.state.startup_status["database"] = "disconnected"
-        logger.warning("PostgreSQL init failed: %s", exc)
+        logger.warning("SQL Server init failed: %s", exc)
 
     logger.info("Authentication enabled")
     logger.info("Application startup complete")

@@ -44,7 +44,7 @@ DOMAIN_TRENDS = {"labels": ["Banking", "Healthcare", "Retail", "Insurance", "IT/
 @app.on_event("startup")
 def startup():
     print("FastAPI server starting")
-    print("DATABASE_URL loaded:", bool(os.getenv("DATABASE_URL")))
+    print("MSSQL_DATABASE_URL loaded:", bool(os.getenv("MSSQL_DATABASE_URL")))
     try:
         create_tables()
         print("Database initialized successfully")

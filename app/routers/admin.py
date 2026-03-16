@@ -51,8 +51,10 @@ async def get_admin_leads(
         if date:
             try:
                 filter_date = datetime.strptime(date, "%Y-%m-%d").date()
-                day_start = datetime.combine(filter_date, datetime.min.time(), tzinfo=IST)
-                day_end = day_start + timedelta(days=1)
+                day_start_ist = datetime.combine(filter_date, datetime.min.time(), tzinfo=IST)
+                day_end_ist = day_start_ist + timedelta(days=1)
+                day_start = day_start_ist.astimezone(timezone.utc).replace(tzinfo=None)
+                day_end = day_end_ist.astimezone(timezone.utc).replace(tzinfo=None)
                 query = query.filter(Lead.created_at >= day_start, Lead.created_at < day_end)
             except ValueError:
                 return _err("Invalid date format. Use YYYY-MM-DD.", 400)

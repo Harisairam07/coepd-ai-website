@@ -15,8 +15,5 @@ Tech Stack
 - HTML / CSS / JavaScript
 - Jinja Templates
 
-Deployment
-Hosted using cloud platforms like Render or Railway.
-
-Render Start Command
-uvicorn main:app --host 0.0.0.0 --port $PORT --workers 2 --proxy-headers
+Run Locally
+python -m uvicorn main:app --reload

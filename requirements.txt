@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 sqlalchemy
-psycopg2-binary
+pyodbc
 python-dotenv
 jinja2
 aiofiles
