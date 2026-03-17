@@ -9,7 +9,18 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DEFAULT_SQLITE_URL = f"sqlite:///{(BASE_DIR / 'coepd_local.db').as_posix()}"
+# Use persistent disk path on Render when available; fall back to local workspace.
+DEFAULT_SQLITE_PATH = (
+    Path(os.getenv("SQLITE_DATABASE_PATH", "")).expanduser()
+    if (os.getenv("SQLITE_DATABASE_PATH") or "").strip()
+    else (
+        Path("/var/data/coepd_local.db")
+        if (os.getenv("RENDER") or "").strip().lower() == "true"
+        else (BASE_DIR / "coepd_local.db")
+    )
+)
+DEFAULT_SQLITE_PATH.parent.mkdir(parents=True, exist_ok=True)
+DEFAULT_SQLITE_URL = f"sqlite:///{DEFAULT_SQLITE_PATH.as_posix()}"
 MSSQL_DATABASE_URL = (os.getenv("MSSQL_DATABASE_URL") or "").strip()
 DATABASE_URL = MSSQL_DATABASE_URL or DEFAULT_SQLITE_URL
 
