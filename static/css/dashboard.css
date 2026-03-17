@@ -78,6 +78,14 @@ body {
 .card-value--chatbot { color: #1e40af; }
 .card-value--website { color: #166534; }
 
+.charts-with-logo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
 .chart {
   background: var(--a-card);
   border: 1px solid var(--a-border);
@@ -91,6 +99,23 @@ body {
 }
 .chart h3 { margin: 0 0 10px; font-size: 15px; font-weight: 600; }
 .chart-wrap { position: relative; flex: 1; min-height: 0; }
+.chart-logo {
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  border: 1px solid var(--a-border);
+  background: radial-gradient(circle at 30% 30%, #ffffff, #f1f5ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  box-shadow: var(--a-shadow);
+}
+.chart-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 
 .toolbar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
 .toolbar input,
@@ -238,6 +263,8 @@ tbody tr:last-child td { border-bottom: none; }
   .wrap { padding: 16px; }
   td, th { font-size: 12px; padding: 8px 10px; }
   .table-wrap { max-height: 58vh; }
+  .charts-with-logo { grid-template-columns: 1fr; }
+  .chart-logo { margin: 0 auto; order: 2; }
 }
 
 @media (max-width: 600px) {

@@ -54,12 +54,15 @@
     </div>
 
     {% if current_user.role == 'admin' %}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+    <div class="charts-with-logo">
       <div class="chart">
         <h3>Lead Growth (Current Month)</h3>
         <div class="chart-wrap">
           <canvas id="leadChart"></canvas>
         </div>
+      </div>
+      <div class="chart-logo" aria-hidden="true">
+        <img src="/static/images/logo2.png" alt="COEPD logo" />
       </div>
       <div class="chart">
         <h3>Leads by Source</h3>

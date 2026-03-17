@@ -2,7 +2,7 @@
   const charts = {};
   const palette = ["#22c55e", "#6366f1", "#f59e0b", "#f97316", "#ec4899", "#06b6d4"];
   const logoImage = new Image();
-  logoImage.src = "/static/images/coepd-logo.png?v=20260314";
+  logoImage.src = "/static/images/logo2.png?v=20260317";
 
   const centerLogoPlugin = {
     id: "centerLogo",
@@ -28,7 +28,7 @@
 
       if (!logoImage.complete) return;
 
-      const logoSize = innerRadius * 1.05;
+      const logoSize = innerRadius * 1.38;
       ctx.save();
       ctx.translate(x, y);
       ctx.drawImage(logoImage, -logoSize / 2, -logoSize / 2, logoSize, logoSize);
