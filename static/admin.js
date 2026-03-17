@@ -126,11 +126,17 @@ function updateSectionTitle() {
 }
 
 function updatePager() {
+  const pager = document.getElementById("pager");
   const pageInfo = document.getElementById("page-info");
   const prevBtn = document.getElementById("prev-page");
   const nextBtn = document.getElementById("next-page");
+  const totalItems = allLeads.length;
 
-  const totalPages = Math.max(1, Math.ceil(allLeads.length / pageSize));
+  if (pager) {
+    pager.style.display = totalItems ? "flex" : "none";
+  }
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   if (currentPage > totalPages) currentPage = totalPages;
 
   if (pageInfo) pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;

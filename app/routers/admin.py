@@ -1,10 +1,12 @@
+import csv
 import logging
+from io import StringIO
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 import bcrypt
 from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -202,6 +204,52 @@ async def get_source_breakdown(db: Session = Depends(get_db)):
 
 
 # ── Staff management ─────────────────────────────────────────────────────
+
+
+@router.get("/export")
+async def export_leads_csv(db: Session = Depends(get_db)):
+    if not db_available():
+        return _err(DB_UNAVAILABLE, 503)
+    try:
+        leads = db.query(Lead).order_by(Lead.created_at.desc()).all()
+
+        csv_buffer = StringIO()
+        writer = csv.writer(csv_buffer)
+        writer.writerow([
+            "ID",
+            "Name",
+            "Phone",
+            "Email",
+            "Location",
+            "Interested Domain",
+            "WhatsApp",
+            "Source",
+            "Created At",
+        ])
+
+        for lead in leads:
+            writer.writerow([
+                lead.id,
+                lead.name or "",
+                lead.phone or "",
+                lead.email or "",
+                lead.location or "",
+                lead.interested_domain or "",
+                lead.whatsapp or "",
+                lead.source or "webpage",
+                format_ist(lead.created_at),
+            ])
+
+        csv_buffer.seek(0)
+        filename = f"coepd-leads-{datetime.now().strftime('%Y-%m-%d')}.csv"
+        return StreamingResponse(
+            iter([csv_buffer.getvalue()]),
+            media_type="text/csv",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+        )
+    except Exception as exc:
+        logger.exception("GET /api/admin/export failed")
+        return _err("Unable to export CSV right now", 500)
 
 
 @router.get("/staff")
