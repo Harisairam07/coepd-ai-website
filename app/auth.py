@@ -130,8 +130,22 @@ def authenticate_user(email: str, password: str) -> dict[str, Any] | None:
         logger.warning("Login attempt with empty email")
         return None
 
+    # Always allow configured admin credentials even when DB is unavailable.
+    # This prevents login pages from hanging on unreachable SQL Server.
+    if (
+        normalized_email == ADMIN_LOGIN_EMAIL
+        and (password or "") == ADMIN_LOGIN_PASSWORD
+    ):
+        return {
+            "id": 0,
+            "name": "Admin",
+            "email": normalized_email,
+            "role": "admin",
+            "is_active": True,
+        }
+
     if not db_available():
-        logger.error("Cannot authenticate: database engine not initialized")
+        logger.error("Cannot authenticate non-admin user: database unavailable")
         return None
 
     db = SessionLocal()

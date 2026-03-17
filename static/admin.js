@@ -391,8 +391,6 @@ async function refreshDashboard() {
     const hasFailure = failures.length > 0;
     if (hasFailure) {
       setStatus("Unable to refresh some dashboard data.", true);
-      const reason = failures[0]?.reason;
-      alert(getErrorMessage(reason, "Unable to refresh some dashboard data."));
       return;
     }
     setStatus("Dashboard updated.");

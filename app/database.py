@@ -1,4 +1,6 @@
 import os
+import time
+from pathlib import Path
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, inspect, text
@@ -6,14 +8,23 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 
 load_dotenv()
 
-DATABASE_URL = os.getenv(
-    "MSSQL_DATABASE_URL",
-    "mssql+pyodbc://@localhost\\SQLEXPRESS/coepd_ai_leads?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes&Encrypt=no",
-)
+BASE_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_SQLITE_URL = f"sqlite:///{(BASE_DIR / 'coepd_local.db').as_posix()}"
+MSSQL_DATABASE_URL = (os.getenv("MSSQL_DATABASE_URL") or "").strip()
+DATABASE_URL = MSSQL_DATABASE_URL or DEFAULT_SQLITE_URL
+
+DB_CONNECT_TIMEOUT_SECONDS = int(os.getenv("DB_CONNECT_TIMEOUT_SECONDS", "5"))
+DB_AVAILABILITY_CACHE_SECONDS = int(os.getenv("DB_AVAILABILITY_CACHE_SECONDS", "30"))
+
+engine_connect_args = {"timeout": DB_CONNECT_TIMEOUT_SECONDS}
+if DATABASE_URL.startswith("sqlite"):
+    # SQLite uses a different connect arg; also needed for FastAPI threaded handlers.
+    engine_connect_args = {"check_same_thread": False}
 
 engine = create_engine(
     DATABASE_URL,
     pool_pre_ping=True,
+    connect_args=engine_connect_args,
 )
 
 SessionLocal = sessionmaker(
@@ -23,6 +34,7 @@ SessionLocal = sessionmaker(
 )
 
 Base = declarative_base()
+_db_status_cache: dict[str, float | bool] = {"ok": False, "checked_at": 0.0}
 
 
 def get_db():
@@ -39,7 +51,8 @@ def create_tables():
     import app.db_models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
-    _ensure_sqlserver_schema_compatibility()
+    if DATABASE_URL.startswith("mssql"):
+        _ensure_sqlserver_schema_compatibility()
 
 
 def _ensure_sqlserver_schema_compatibility() -> None:
@@ -115,8 +128,17 @@ def _ensure_sqlserver_schema_compatibility() -> None:
 
 def db_available():
     """Return True if database connection works."""
+    now = time.monotonic()
+    checked_at = float(_db_status_cache.get("checked_at", 0.0) or 0.0)
+    if now - checked_at < DB_AVAILABILITY_CACHE_SECONDS:
+        return bool(_db_status_cache.get("ok", False))
+
     try:
         with engine.connect():
+            _db_status_cache["ok"] = True
+            _db_status_cache["checked_at"] = now
             return True
     except Exception:
+        _db_status_cache["ok"] = False
+        _db_status_cache["checked_at"] = now
         return False

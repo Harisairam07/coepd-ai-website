@@ -45,6 +45,9 @@ def list_leads(
     search: str | None = None,
     interested_domain: str | None = None,
 ) -> list[dict]:
+    if not db_available():
+        return []
+
     db = SessionLocal()
     try:
         query = db.query(Lead)
@@ -95,6 +98,9 @@ def list_leads(
 
 
 def remove_lead(lead_id: int) -> bool:
+    if not db_available():
+        return False
+
     db = SessionLocal()
     try:
         lead = db.query(Lead).filter(Lead.id == lead_id).first()
@@ -112,6 +118,16 @@ def set_lead_status(lead_id: int, working_status: str) -> bool:
 
 
 def fetch_dashboard_stats() -> dict:
+    if not db_available():
+        return {
+            "total_leads": 0,
+            "today_leads": 0,
+            "week_leads": 0,
+            "month_leads": 0,
+            "chatbot_leads": 0,
+            "website_leads": 0,
+        }
+
     db = SessionLocal()
     try:
         analytics = build_analytics_response_for_db(db)
@@ -136,6 +152,9 @@ def list_dashboard_leads_paginated(
     page_size: int = 20,
     search: str | None = None,
 ) -> dict:
+    if not db_available():
+        return {"items": [], "total": 0, "page": max(1, int(page or 1)), "page_size": max(1, int(page_size or 20))}
+
     db = SessionLocal()
     try:
         query = db.query(Lead)

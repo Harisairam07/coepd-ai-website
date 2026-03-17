@@ -8,6 +8,7 @@
     isOpen: false,
     userId: localStorage.getItem("coepd_chat_uid") || `coepd_${Date.now()}`,
     loading: false,
+    started: false,
   };
   localStorage.setItem("coepd_chat_uid", state.userId);
 
@@ -209,11 +210,26 @@
     const form = document.getElementById("cb-form");
     const input = document.getElementById("cb-input");
 
+    function ensureChatStarted() {
+      if (state.started) return;
+      state.started = true;
+      const storedFlowVersion = localStorage.getItem("coepd_chat_flow_version");
+      if (storedFlowVersion !== CHATBOT_FLOW_VERSION) {
+        localStorage.setItem("coepd_chat_flow_version", CHATBOT_FLOW_VERSION);
+        sendMessage("__restart__", false);
+        return;
+      }
+      sendMessage("__init__", false);
+    }
+
     launcher.addEventListener("click", function () {
       state.isOpen = !state.isOpen;
       widget.classList.toggle("open", state.isOpen);
       launcher.classList.toggle("open", state.isOpen);
-      if (state.isOpen) input.focus();
+      if (state.isOpen) {
+        ensureChatStarted();
+        input.focus();
+      }
     });
 
     document.getElementById("cb-min").addEventListener("click", function () {
@@ -232,6 +248,7 @@
       document.getElementById("cb-log").innerHTML = "";
       setProgress(0);
       setOptions([]);
+      state.started = true;
       sendMessage("__restart__", false);
     });
 
@@ -245,13 +262,6 @@
     injectStyles();
     injectMarkup();
     bindEvents();
-    const storedFlowVersion = localStorage.getItem("coepd_chat_flow_version");
-    if (storedFlowVersion !== CHATBOT_FLOW_VERSION) {
-      localStorage.setItem("coepd_chat_flow_version", CHATBOT_FLOW_VERSION);
-      sendMessage("__restart__", false);
-      return;
-    }
-    sendMessage("__init__", false);
   }
 
   if (document.readyState === "loading") {

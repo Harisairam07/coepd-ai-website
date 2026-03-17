@@ -9,7 +9,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.auth import get_current_admin
-from app.database import get_db
+from app.database import db_available, get_db
 from app.db_models import Lead, Staff, IST, to_ist, format_ist
 from app.services.analytics_service import build_analytics_response_for_db
 
@@ -43,8 +43,8 @@ async def get_admin_leads(
     interested_domain: str | None = None,
     db: Session = Depends(get_db),
 ):
-    if db is None:
-        return _err(DB_UNAVAILABLE, 503)
+    if not db_available():
+        return {"leads": []}
     try:
         query = db.query(Lead)
 
@@ -105,7 +105,7 @@ async def get_admin_leads(
         return {"leads": result}
     except Exception as exc:
         logger.exception("GET /api/admin/leads failed")
-        return _err(str(exc), 500)
+        return {"leads": []}
 
 
 @router.delete("/leads/{lead_id}")
@@ -113,7 +113,7 @@ async def delete_lead(
     lead_id: int,
     db: Session = Depends(get_db),
 ):
-    if db is None:
+    if not db_available():
         return _err(DB_UNAVAILABLE, 503)
     try:
         lead = db.query(Lead).filter(Lead.id == lead_id).first()
@@ -124,7 +124,7 @@ async def delete_lead(
         return {"success": True}
     except Exception as exc:
         logger.exception("DELETE /api/admin/leads/%s failed", lead_id)
-        return _err(str(exc), 500)
+        return _err("Unable to delete lead right now", 500)
 
 
 # ── Stats ────────────────────────────────────────────────────────────────
@@ -132,8 +132,15 @@ async def delete_lead(
 
 @router.get("/stats")
 async def get_stats(db: Session = Depends(get_db)):
-    if db is None:
-        return _err(DB_UNAVAILABLE, 503)
+    if not db_available():
+        return {
+            "total_leads": 0,
+            "today_leads": 0,
+            "week_leads": 0,
+            "month_leads": 0,
+            "chatbot_leads": 0,
+            "website_leads": 0,
+        }
     try:
         analytics = build_analytics_response_for_db(db)
         return {
@@ -146,14 +153,21 @@ async def get_stats(db: Session = Depends(get_db)):
         }
     except Exception as exc:
         logger.exception("GET /api/admin/stats failed")
-        return _err(str(exc), 500)
+        return {
+            "total_leads": 0,
+            "today_leads": 0,
+            "week_leads": 0,
+            "month_leads": 0,
+            "chatbot_leads": 0,
+            "website_leads": 0,
+        }
 
 
 @router.get("/lead-growth")
 async def get_lead_growth(db: Session = Depends(get_db)):
     """Return current-month day-by-day lead counts for charting."""
-    if db is None:
-        return _err(DB_UNAVAILABLE, 503)
+    if not db_available():
+        return {"daily_leads": [], "labels": [], "data": []}
     try:
         analytics = build_analytics_response_for_db(db)
         return {
@@ -163,14 +177,14 @@ async def get_lead_growth(db: Session = Depends(get_db)):
         }
     except Exception as exc:
         logger.exception("GET /api/admin/lead-growth failed")
-        return _err(str(exc), 500)
+        return {"daily_leads": [], "labels": [], "data": []}
 
 
 @router.get("/source-breakdown")
 async def get_source_breakdown(db: Session = Depends(get_db)):
     """Return lead counts grouped by source for the doughnut chart."""
-    if db is None:
-        return _err(DB_UNAVAILABLE, 503)
+    if not db_available():
+        return {}
     try:
         rows = (
             db.query(Lead.source, func.count(Lead.id))
@@ -184,7 +198,7 @@ async def get_source_breakdown(db: Session = Depends(get_db)):
         return result
     except Exception as exc:
         logger.exception("GET /api/admin/source-breakdown failed")
-        return _err(str(exc), 500)
+        return {}
 
 
 # ── Staff management ─────────────────────────────────────────────────────
@@ -192,8 +206,8 @@ async def get_source_breakdown(db: Session = Depends(get_db)):
 
 @router.get("/staff")
 async def list_staff(db: Session = Depends(get_db)):
-    if db is None:
-        return _err(DB_UNAVAILABLE, 503)
+    if not db_available():
+        return {"staff": []}
     try:
         users = db.query(Staff).order_by(Staff.created_at.desc()).all()
         return {
@@ -211,12 +225,12 @@ async def list_staff(db: Session = Depends(get_db)):
         }
     except Exception as exc:
         logger.exception("GET /api/admin/staff failed")
-        return _err(str(exc), 500)
+        return {"staff": []}
 
 
 @router.post("/staff")
 async def create_staff(payload: dict, db: Session = Depends(get_db)):
-    if db is None:
+    if not db_available():
         return _err(DB_UNAVAILABLE, 503)
     try:
         name = str(payload.get("name", "")).strip()
@@ -246,7 +260,7 @@ async def create_staff(payload: dict, db: Session = Depends(get_db)):
         return {"success": True, "id": staff.id}
     except Exception as exc:
         logger.exception("POST /api/admin/staff failed")
-        return _err(str(exc), 500)
+        return _err("Unable to create staff right now", 500)
 
 
 @router.post("/create-staff")
@@ -257,7 +271,7 @@ async def create_staff_compat(payload: dict, db: Session = Depends(get_db)):
 
 @router.put("/staff/activate/{user_id}")
 async def activate_staff(user_id: int, db: Session = Depends(get_db)):
-    if db is None:
+    if not db_available():
         return _err(DB_UNAVAILABLE, 503)
     try:
         user = db.query(Staff).filter(Staff.id == user_id).first()
@@ -268,12 +282,12 @@ async def activate_staff(user_id: int, db: Session = Depends(get_db)):
         return {"success": True}
     except Exception as exc:
         logger.exception("POST /api/admin/staff/activate/%s failed", user_id)
-        return _err(str(exc), 500)
+        return _err("Unable to activate user right now", 500)
 
 
 @router.put("/staff/deactivate/{user_id}")
 async def deactivate_staff(user_id: int, db: Session = Depends(get_db)):
-    if db is None:
+    if not db_available():
         return _err(DB_UNAVAILABLE, 503)
     try:
         user = db.query(Staff).filter(Staff.id == user_id).first()
@@ -284,12 +298,12 @@ async def deactivate_staff(user_id: int, db: Session = Depends(get_db)):
         return {"success": True}
     except Exception as exc:
         logger.exception("POST /api/admin/staff/deactivate/%s failed", user_id)
-        return _err(str(exc), 500)
+        return _err("Unable to deactivate user right now", 500)
 
 
 @router.put("/staff/set-role/{user_id}")
 async def set_staff_role(user_id: int, payload: dict, db: Session = Depends(get_db)):
-    if db is None:
+    if not db_available():
         return _err(DB_UNAVAILABLE, 503)
     try:
         new_role = str(payload.get("role", "")).strip().lower()
@@ -303,12 +317,12 @@ async def set_staff_role(user_id: int, payload: dict, db: Session = Depends(get_
         return {"success": True}
     except Exception as exc:
         logger.exception("POST /api/admin/staff/set-role/%s failed", user_id)
-        return _err(str(exc), 500)
+        return _err("Unable to update role right now", 500)
 
 
 @router.delete("/staff/{user_id}")
 async def delete_staff(user_id: int, db: Session = Depends(get_db)):
-    if db is None:
+    if not db_available():
         return _err(DB_UNAVAILABLE, 503)
     try:
         user = db.query(Staff).filter(Staff.id == user_id).first()
@@ -319,4 +333,4 @@ async def delete_staff(user_id: int, db: Session = Depends(get_db)):
         return {"success": True}
     except Exception as exc:
         logger.exception("DELETE /api/admin/staff/%s failed", user_id)
-        return _err(str(exc), 500)
+        return _err("Unable to delete user right now", 500)

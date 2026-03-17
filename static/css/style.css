@@ -521,6 +521,44 @@ section{ position:relative; z-index:1; margin-top:0; }
 .card-grid { display: grid; gap: 24px; }
 .card-grid--2 { grid-template-columns: repeat(2, 1fr); }
 .card-grid--3 { grid-template-columns: repeat(3, 1fr); }
+.card-grid--3 { gap: 24px; }
+
+#program.section {
+  position: relative;
+  isolation: isolate;
+  background-image:
+    linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
+    url('/static/images/program-bg.png?v=20260317d');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+#program.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)),
+    radial-gradient(circle at 16% 18%, rgba(59, 130, 246, 0.07), transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(14, 165, 233, 0.06), transparent 40%);
+}
+
+#program.section > .container {
+  position: relative;
+  z-index: 1;
+}
+
+#program .glass-card {
+  background: linear-gradient(165deg, rgba(255,255,255,0.60), rgba(248,251,255,0.50));
+  border: 1px solid rgba(191, 219, 254, 0.86);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
 .card-grid--4 { grid-template-columns: repeat(4, 1fr); }
 
 .glass-card {
@@ -746,7 +784,7 @@ section{ position:relative; z-index:1; margin-top:0; }
   isolation: isolate;
   background-image:
     linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
-    url('/static/images/success-stories-bg.png?v=20260317b');
+    url('/static/images/success-stories-bg.png?v=20260317d');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -980,6 +1018,40 @@ section{ position:relative; z-index:1; margin-top:0; }
 
 /* ─── CONTACT ──────────────────────────────────────────── */
 .contact-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 28px; align-items: start; }
+#contact.section{
+  position: relative;
+  isolation: isolate;
+  background-image:
+    linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
+    url('/static/images/contact-bg.png?v=20260317d');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 28px;
+  overflow: hidden;
+}
+#contact.section::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)),
+    radial-gradient(circle at 16% 18%, rgba(59, 130, 246, 0.07), transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(14, 165, 233, 0.06), transparent 40%);
+}
+#contact.section > .container{
+  position: relative;
+  z-index: 1;
+}
+.contact-info-card,
+.contact-form{
+  background: linear-gradient(165deg, rgba(255,255,255,0.62), rgba(248,251,255,0.52));
+  border: 1px solid rgba(191, 219, 254, 0.86);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
 .contact-info-card h3 { font-size: 1.15rem; margin-bottom: 20px; }
 .ci-item { margin-bottom: 18px; }
 .ci-item strong { display: block; font-size: 13px; color: var(--text); margin-bottom: 4px; }
@@ -1695,7 +1767,7 @@ section{ position:relative; z-index:1; margin-top:0; }
   isolation: isolate;
   background-image:
     linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
-    url('/static/images/benefits-bg.png?v=20260317b');
+    url('/static/images/benefits-bg.png?v=20260317d');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -2117,7 +2189,7 @@ section{ position:relative; z-index:1; margin-top:0; }
   scroll-margin-top: 96px;
   background-image:
     linear-gradient(180deg, rgba(247, 250, 255, 0.44), rgba(239, 246, 255, 0.50)),
-    url('/static/images/market-trends-bg.png?v=20260317b');
+    url('/static/images/market-trends-bg.png?v=20260317d');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -3000,16 +3072,23 @@ section.hero#home .pd-badge {
 
 /* Hero background image layout */
 .hero-section{
-height:92vh;
+min-height: calc(100vh - 70px);
+height:auto;
 display:flex;
 align-items:center;
 position:relative;
 padding-top:90px;
-overflow:hidden;
-background-image:url("/static/images/coepd-ba-graduate.png?v=20260314");
+padding-bottom:48px;
+overflow:visible;
+background-image:url("/static/images/coepd-ba-graduate.png?v=20260317e");
 background-size:cover;
 background-position:118% center;
 background-repeat:no-repeat;
+}
+@media (max-width: 768px){
+  #contact.section{
+    border-radius: 18px;
+  }
 }
 
 .hero-section::before{
@@ -3035,7 +3114,7 @@ pointer-events:none;
 position:relative;
 z-index:2;
 width:100%;
-height:100%;
+height:auto;
 display:flex;
 align-items:center;
 }
@@ -3043,32 +3122,36 @@ align-items:center;
 .hero-content{
 position:relative;
 z-index:3;
-max-width:650px;
+max-width:620px;
 margin-left:8%;
+padding: 6px 0 10px;
 }
 
 .hero-content h1{
-font-size:56px;
+font-size:clamp(40px, 4.6vw, 56px);
 font-weight:800;
-line-height:1.05;
+line-height:1.02;
 color:#111827;
-letter-spacing:-0.5px;
+letter-spacing:-0.8px;
 text-shadow:0 1px 0 rgba(255,255,255,0.4);
+margin-bottom: 10px;
 }
 
 .hero-content h3{
 margin-top:12px;
-font-size:22px;
+font-size:clamp(24px, 2vw, 32px);
 font-weight:700;
-line-height:1.2;
+line-height:1.22;
 color:#111827;
+max-width: 600px;
 }
 
 .hero-content p{
 margin-top:18px;
-font-size:18px;
-line-height:1.6;
+font-size:15px;
+line-height:1.65;
 color:#1f2937;
+max-width: 560px;
 }
 
 .hero-features{
@@ -3079,33 +3162,37 @@ gap:8px;
 }
 
 .hero-features li{
-font-size:18px;
-line-height:1.45;
+font-size:15px;
+line-height:1.5;
 color:#111827;
 }
 
 .hero-buttons{
-margin-top:30px;
+margin-top:24px;
 display:flex;
 gap:16px;
+align-items:center;
+flex-wrap:wrap;
 }
 
 .hero-section .btn-primary{
 background:#6366f1;
 color:#fff;
-padding:14px 32px;
+padding:12px 22px;
 border-radius:12px;
 font-weight:600;
 box-shadow:0 10px 22px rgba(99,102,241,.28);
+font-size: 16px;
 }
 
 .hero-section .btn-secondary{
 background:#10b981;
 color:#fff;
-padding:14px 32px;
+padding:12px 22px;
 border-radius:12px;
 font-weight:600;
 border:none;
+font-size: 16px;
 }
 
 @media(max-width:768px){
@@ -3121,7 +3208,7 @@ max-width:100%;
 }
 
 .hero-content h1{
-font-size:38px;
+font-size:34px;
 }
 
 .hero-content h3{
@@ -3129,7 +3216,7 @@ font-size:22px;
 }
 
 .hero-features li{
-font-size:16px;
+font-size:14px;
 }
 
 .hero-buttons{
@@ -3151,7 +3238,7 @@ background-position:130% center;
   padding-top: 8px;
   background-image:
     linear-gradient(180deg, rgba(247, 250, 255, 0.40), rgba(239, 246, 255, 0.44)),
-    url('/static/images/tools-bg.png?v=20260317');
+    url('/static/images/tools-bg.png?v=20260317d');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -3306,7 +3393,7 @@ background-position:130% center;
   margin-top: 56px;
   background-image:
     linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
-    url('/static/images/curriculum-bg.png?v=20260317b');
+    url('/static/images/curriculum-bg.png?v=20260317d');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -3493,35 +3580,116 @@ background-position:130% center;
 
 /* Final hero image clarity override: keep graduate cap fully visible */
 .hero::before{
-  background-position: 64% 8%;
-  opacity: 0.34;
-  filter: saturate(1.02) brightness(.78);
+  background-position: 80% 16%;
+  background-size: cover;
+  opacity: 0.48;
+  filter: saturate(1.08) brightness(1.01) contrast(1.02);
 }
 
 .hero-section{
-  background-image:url("/static/images/coepd-ba-graduate.png?v=20260314") !important;
-  background-position: 88% 12% !important;
+  background-image:url("/static/images/coepd-ba-graduate.png?v=20260317e") !important;
+  background-position: 80% 16% !important;
   background-size: cover !important;
+  background-repeat: no-repeat !important;
+  background-color: #dfe8f4 !important;
+  background-image:
+    linear-gradient(90deg, #d7e2f0 0%, #dfe8f4 30%, #e8eef7 55%, #dfe8f4 100%),
+    url("/static/images/coepd-ba-graduate.png?v=20260317e") !important;
 }
 
 .hero-section::before{
   background:linear-gradient(
     90deg,
-    rgba(255,255,255,0.95) 0%,
-    rgba(255,255,255,0.88) 30%,
-    rgba(255,255,255,0.62) 50%,
-    rgba(255,255,255,0.28) 70%,
-    rgba(255,255,255,0.08) 86%
+    rgba(255,255,255,0.84) 0%,
+    rgba(255,255,255,0.68) 30%,
+    rgba(255,255,255,0.45) 48%,
+    rgba(255,255,255,0.24) 68%,
+    rgba(255,255,255,0.14) 88%
   ) !important;
+  z-index:1;
+}
+
+.hero-overlay,
+.hero-content{
+  position:relative;
+  z-index:2;
 }
 
 @media(max-width:768px){
   .hero::before{
-    background-position: 68% 6%;
-    opacity: 0.4;
+    background-position: 74% 12%;
+    background-size: cover;
+    opacity: 0.44;
   }
   .hero-section{
-    background-position: 72% 10% !important;
+    background-position: 74% 12% !important;
+    background-size: cover !important;
+  }
+}
+
+/* Final home text fix */
+.hero-content h1{
+  font-size: clamp(44px, 4.8vw, 60px) !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.6px !important;
+  font-weight: 800 !important;
+  margin: 0 0 10px !important;
+}
+
+.hero-content h3{
+  font-size: clamp(22px, 2.1vw, 30px) !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  margin: 10px 0 8px !important;
+  max-width: 640px !important;
+}
+
+.hero-content p{
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  margin-top: 14px !important;
+  max-width: 640px !important;
+}
+
+.hero-features{
+  margin-top: 12px !important;
+  gap: 8px !important;
+}
+
+.hero-features li{
+  font-size: 18px !important;
+  line-height: 1.45 !important;
+}
+
+.hero-buttons{
+  margin-top: 22px !important;
+}
+
+.hero-section .btn-primary,
+.hero-section .btn-secondary{
+  padding: 13px 24px !important;
+  font-size: 17px !important;
+}
+
+@media(max-width:768px){
+  .hero-content h1{
+    font-size: 36px !important;
+    line-height: 1.08 !important;
+  }
+  .hero-content h3{
+    font-size: 21px !important;
+    line-height: 1.3 !important;
+  }
+  .hero-content p{
+    font-size: 16px !important;
+  }
+  .hero-features li{
+    font-size: 15px !important;
+  }
+  .hero-section .btn-primary,
+  .hero-section .btn-secondary{
+    font-size: 15px !important;
+    padding: 12px 20px !important;
   }
 }
 
@@ -3730,7 +3898,7 @@ main.page{
   margin-top: 0 !important;
   padding-top: 32px !important;
   padding-bottom: 88px;
-  background-image: url('/static/images/coepd-ba-graduate.png?v=20260314');
+  background-image: url('/static/images/coepd-ba-graduate.png?v=20260317e');
   background-size: cover;
   background-position: center 18%;
   background-repeat: no-repeat;
@@ -3769,7 +3937,7 @@ section{ margin-top: 0 !important; }
 
 /* Ensure hero image source is valid and consistent */
 .hero-section{
-  background-image: url('/static/images/coepd-ba-graduate.png?v=20260314') !important;
+  background-image: url('/static/images/coepd-ba-graduate.png?v=20260317e') !important;
 }
 
 /* Keep spacing predictable below fixed header */
@@ -3836,7 +4004,7 @@ main.page{
     radial-gradient(circle at 88% 20%, rgba(16, 185, 129, 0.2), transparent 32%),
     radial-gradient(circle at 50% 100%, rgba(251, 191, 36, 0.18), transparent 38%),
     linear-gradient(140deg, #f0f9ff 0%, #eefbf4 35%, #fff7ed 70%, #f8fafc 100%),
-    url('/static/images/coepd-ba-graduate.png?v=20260314');
+    url('/static/images/coepd-ba-graduate.png?v=20260317e');
   background-size: cover, cover, cover, cover, cover;
   background-position: center, center, center, center, center 18%;
 }
@@ -3859,6 +4027,8 @@ main.page{
   border-color: rgba(14, 116, 144, 0.28);
   background: linear-gradient(135deg, #dbeafe, #dcfce7);
   box-shadow: 0 8px 22px rgba(14, 116, 144, 0.15);
+  display: inline-flex;
+  margin: 0 auto 12px;
 }
 
 #hiring-partners .section-header h2 {
@@ -3867,6 +4037,8 @@ main.page{
   background-clip: text;
   color: transparent;
   font-size: clamp(2rem, 3.8vw, 3.2rem);
+  display: block;
+  margin-top: 0;
 }
 
 #hiring-partners .section-desc {
@@ -4050,7 +4222,7 @@ main.page{
     radial-gradient(circle at 88% 18%, rgba(34, 197, 94, 0.03), transparent 32%),
     radial-gradient(circle at 52% 100%, rgba(245, 158, 11, 0.03), transparent 40%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.60), rgba(255, 255, 255, 0.66)),
-    url('/static/images/placement-process.jpg?v=20260316');
+    url('/static/images/placement-process.jpg?v=20260317d');
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
   background-position: 10% 14%, 88% 18%, 50% 100%, center, center;
   background-size: 120% 120%, 110% 110%, 110% 110%, cover, cover;
@@ -4302,4 +4474,7 @@ main.page{
     min-height: 34px;
   }
 }
+
+
+
 

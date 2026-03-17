@@ -155,50 +155,43 @@ def create_app() -> FastAPI:
         logger.warning("Chatbot DB init skipped: %s", exc)
 
     # ── Initialise SQL Server tables/users ───────────────────────────────────
-    mssql_url = (os.getenv("MSSQL_DATABASE_URL") or "").strip()
-    if not mssql_url:
-        app.state.startup_status["database"] = "disconnected"
-        logger.info("MSSQL_DATABASE_URL not set; skipping SQL Server initialization")
-    else:
+    try:
+        from app.database import create_tables, SessionLocal, DATABASE_URL
+        from app.db_models import Staff
+
+        create_tables()
+        app.state.startup_status["database"] = "connected"
+        logger.info("Database initialized (%s)", DATABASE_URL)
+
+        # Seed default admin user
+        import bcrypt
+        from sqlalchemy import func as sa_func
+        admin_email = (os.getenv("ADMIN_LOGIN_EMAIL") or "admin").strip().lower()
+        admin_password = (os.getenv("ADMIN_LOGIN_PASSWORD") or "admin").strip()
+        db = SessionLocal()
         try:
-            from app.database import create_tables, SessionLocal
-            from app.db_models import Staff
+            existing = db.query(Staff).filter(sa_func.lower(Staff.email) == admin_email).first()
+            if not existing:
+                pw_hash = bcrypt.hashpw(admin_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+                db.add(Staff(name="Admin", email=admin_email, password_hash=pw_hash, role="admin", status="active"))
+                db.commit()
+                logger.info("Default admin user seeded (email=%s)", admin_email)
+            else:
+                logger.info("Admin user already exists (email=%s)", admin_email)
+        finally:
+            db.close()
 
-            create_tables()
-            app.state.startup_status["database"] = "connected"
-            logger.info("SQL Server tables created")
+        from app.db_models import Lead
+        db = SessionLocal()
+        try:
+            lead_count = db.query(sa_func.count(Lead.id)).scalar() or 0
+            logger.info("Startup check: database connected, %d leads in table", lead_count)
+        finally:
+            db.close()
 
-            # Seed default admin user
-            import bcrypt
-            from sqlalchemy import func as sa_func
-            admin_email = (os.getenv("ADMIN_LOGIN_EMAIL") or "admin").strip().lower()
-            admin_password = (os.getenv("ADMIN_LOGIN_PASSWORD") or "admin").strip()
-            db = SessionLocal()
-            try:
-                existing = db.query(Staff).filter(sa_func.lower(Staff.email) == admin_email).first()
-                if not existing:
-                    pw_hash = bcrypt.hashpw(admin_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-                    db.add(Staff(name="Admin", email=admin_email, password_hash=pw_hash, role="admin", status="active"))
-                    db.commit()
-                    logger.info("Default admin user seeded (email=%s)", admin_email)
-                else:
-                    logger.info("Admin user already exists (email=%s)", admin_email)
-            finally:
-                db.close()
-
-            from app.db_models import Lead
-            db = SessionLocal()
-            try:
-                lead_count = db.query(sa_func.count(Lead.id)).scalar() or 0
-                logger.info("Startup check: database connected, %d leads in table", lead_count)
-            finally:
-                db.close()
-
-            print("Database connected")
-
-        except Exception as exc:
-            app.state.startup_status["database"] = "disconnected"
-            logger.warning("SQL Server init failed: %s", exc)
+    except Exception as exc:
+        app.state.startup_status["database"] = "disconnected"
+        logger.warning("Database init failed: %s", exc)
 
     logger.info("Authentication enabled")
     logger.info("Application startup complete")
@@ -220,3 +213,4 @@ def create_app() -> FastAPI:
         logger.warning("Failed to include some routers: %s", exc)
 
     return app
+
