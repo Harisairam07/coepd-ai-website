@@ -9,17 +9,37 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-# Use persistent disk path on Render when available; fall back to local workspace.
-DEFAULT_SQLITE_PATH = (
-    Path(os.getenv("SQLITE_DATABASE_PATH", "")).expanduser()
-    if (os.getenv("SQLITE_DATABASE_PATH") or "").strip()
-    else (
-        Path("/var/data/coepd_local.db")
-        if (os.getenv("RENDER") or "").strip().lower() == "true"
-        else (BASE_DIR / "coepd_local.db")
-    )
-)
-DEFAULT_SQLITE_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+
+def _resolve_sqlite_path() -> Path:
+    """
+    Pick a writable SQLite path.
+    Prefer the configured path, but don't crash at import time if its parent
+    directory is unavailable on the current host.
+    """
+    configured_path = (os.getenv("SQLITE_DATABASE_PATH") or "").strip()
+    candidates: list[Path] = []
+
+    if configured_path:
+        candidates.append(Path(configured_path).expanduser())
+    elif (os.getenv("RENDER") or "").strip().lower() == "true":
+        candidates.append(Path("/var/data/coepd_local.db"))
+
+    candidates.append(BASE_DIR / "coepd_local.db")
+    candidates.append(Path("/tmp/coepd_local.db"))
+
+    for candidate in candidates:
+        try:
+            candidate.parent.mkdir(parents=True, exist_ok=True)
+            return candidate
+        except OSError:
+            continue
+
+    # Final fallback: relative to the app root, even if parent creation checks failed earlier.
+    return BASE_DIR / "coepd_local.db"
+
+
+DEFAULT_SQLITE_PATH = _resolve_sqlite_path()
 DEFAULT_SQLITE_URL = f"sqlite:///{DEFAULT_SQLITE_PATH.as_posix()}"
 MSSQL_DATABASE_URL = (os.getenv("MSSQL_DATABASE_URL") or "").strip()
 DATABASE_URL = MSSQL_DATABASE_URL or DEFAULT_SQLITE_URL
