@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from fastapi.templating import Jinja2Templates
 
 from app.auth import CSRF_COOKIE_NAME, create_csrf_token
@@ -13,6 +13,10 @@ def register_page_routes(templates: Jinja2Templates) -> APIRouter:
     @router.get("/", response_class=HTMLResponse)
     async def home(request: Request):
         return templates.TemplateResponse("index.html", {"request": request})
+
+    @router.head("/")
+    async def home_head():
+        return Response(status_code=200)
 
     async def render_admin_dashboard(
         request: Request,

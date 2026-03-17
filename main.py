@@ -15,8 +15,6 @@ except Exception:
     pass
 
 
-# SAFE TABLE CREATION & STARTUP LOGGING
-from app.database import create_tables
 from fastapi.responses import JSONResponse
 
 
@@ -39,17 +37,6 @@ INDUSTRY_DEMAND = {"labels": ["Banking", "Healthcare", "Retail"], "data": [6, 3,
 LOCATION_TRENDS = {"labels": ["Hyderabad", "Bangalore", "Pune", "Mumbai", "Chennai"], "data": [25, 25, 18, 10, 11]}
 EXPERIENCE_TRENDS = {"labels": ["0-1 yrs", "1-3 yrs", "3-5 yrs", "5+ yrs"], "data": [22, 34, 28, 16]}
 DOMAIN_TRENDS = {"labels": ["Banking", "Healthcare", "Retail", "Insurance", "IT/Consulting"], "data": [24, 19, 18, 17, 22]}
-
-
-@app.on_event("startup")
-def startup():
-    print("FastAPI server starting")
-    print("MSSQL_DATABASE_URL loaded:", bool(os.getenv("MSSQL_DATABASE_URL")))
-    try:
-        create_tables()
-        print("Database initialized successfully")
-    except Exception as e:
-        print("Database initialization failed:", e)
 
 
 @app.get("/api/domains")

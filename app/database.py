@@ -8,7 +8,7 @@ load_dotenv()
 
 DATABASE_URL = os.getenv(
     "MSSQL_DATABASE_URL",
-    "mssql+pyodbc://@localhost\\SQLEXPESS/coepd_ai_leads?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes&Encrypt=no",
+    "mssql+pyodbc://@localhost\\SQLEXPRESS/coepd_ai_leads?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes&Encrypt=no",
 )
 
 engine = create_engine(

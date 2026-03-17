@@ -1,6 +1,7 @@
 import logging
 import os
 from importlib.util import find_spec
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,7 +13,7 @@ try:
 except Exception:
     SessionMiddleware = None
 
-from app.config import PREFERRED_STATIC_DIR, STATIC_DIR, TEMPLATES_DIR
+from app.config import BASE_DIR, PREFERRED_STATIC_DIR, STATIC_DIR, TEMPLATES_DIR
 from app.auth import AUTH_COOKIE_SECURE, validate_auth_configuration, validate_auth_dependencies
 from app.middleware.auth_middleware import AuthAndSecurityMiddleware
 from app.middleware.rate_limit import RateLimiter
@@ -58,6 +59,39 @@ def _run_startup_checks() -> list[str]:
         warnings.append(f"Authentication dependency warning: {exc}")
 
     warnings.extend(validate_auth_configuration())
+    warnings.extend(_find_merge_conflict_markers())
+    return warnings
+
+
+def _find_merge_conflict_markers() -> list[str]:
+    """
+    Detect unresolved git merge conflict markers in source files.
+    This catches deploy-breaking mistakes before traffic hits affected pages.
+    """
+    warnings: list[str] = []
+    conflict_tokens = ("<<<<<<< ", "=======", ">>>>>>> ")
+    scan_paths = (BASE_DIR / "templates", BASE_DIR / "static", BASE_DIR / "app", BASE_DIR / "main.py")
+    allowed_ext = {".html", ".css", ".js", ".py"}
+
+    file_paths: list[Path] = []
+    for path in scan_paths:
+        if path.is_file():
+            file_paths.append(path)
+            continue
+        if path.is_dir():
+            file_paths.extend(p for p in path.rglob("*") if p.is_file() and p.suffix.lower() in allowed_ext)
+
+    for file_path in file_paths:
+        try:
+            with file_path.open("r", encoding="utf-8", errors="ignore") as fh:
+                for line_no, line in enumerate(fh, start=1):
+                    stripped = line.lstrip()
+                    if any(stripped.startswith(token) for token in conflict_tokens):
+                        rel_path = file_path.relative_to(BASE_DIR)
+                        warnings.append(f"Merge conflict marker found: {rel_path}:{line_no}")
+                        break
+        except Exception as exc:
+            warnings.append(f"Startup file scan warning for {file_path.name}: {exc}")
     return warnings
 
 
@@ -108,7 +142,9 @@ def create_app() -> FastAPI:
     app.middleware("http")(RateLimiter(limit_per_minute=90))
 
     # ── Startup checks ──────────────────────────────────────────────────
-    _run_startup_checks()
+    startup_warnings = _run_startup_checks()
+    for warning in startup_warnings:
+        logger.warning(warning)
 
     # ── Initialise chatbot SQLite DB (deferred import) ───────────────────
     try:
@@ -119,45 +155,50 @@ def create_app() -> FastAPI:
         logger.warning("Chatbot DB init skipped: %s", exc)
 
     # ── Initialise SQL Server tables/users ───────────────────────────────────
-    try:
-        from app.database import create_tables, SessionLocal
-        from app.db_models import Staff
-
-        create_tables()
-        app.state.startup_status["database"] = "connected"
-        logger.info("SQL Server tables created")
-
-        # Seed default admin user
-        import bcrypt
-        from sqlalchemy import func as sa_func
-        admin_email = (os.getenv("ADMIN_LOGIN_EMAIL") or "admin").strip().lower()
-        admin_password = (os.getenv("ADMIN_LOGIN_PASSWORD") or "admin").strip()
-        db = SessionLocal()
-        try:
-            existing = db.query(Staff).filter(sa_func.lower(Staff.email) == admin_email).first()
-            if not existing:
-                pw_hash = bcrypt.hashpw(admin_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-                db.add(Staff(name="Admin", email=admin_email, password_hash=pw_hash, role="admin", status="active"))
-                db.commit()
-                logger.info("Default admin user seeded (email=%s)", admin_email)
-            else:
-                logger.info("Admin user already exists (email=%s)", admin_email)
-        finally:
-            db.close()
-
-        from app.db_models import Lead
-        db = SessionLocal()
-        try:
-            lead_count = db.query(sa_func.count(Lead.id)).scalar() or 0
-            logger.info("Startup check: database connected, %d leads in table", lead_count)
-        finally:
-            db.close()
-
-        print("Database connected")
-
-    except Exception as exc:
+    mssql_url = (os.getenv("MSSQL_DATABASE_URL") or "").strip()
+    if not mssql_url:
         app.state.startup_status["database"] = "disconnected"
-        logger.warning("SQL Server init failed: %s", exc)
+        logger.info("MSSQL_DATABASE_URL not set; skipping SQL Server initialization")
+    else:
+        try:
+            from app.database import create_tables, SessionLocal
+            from app.db_models import Staff
+
+            create_tables()
+            app.state.startup_status["database"] = "connected"
+            logger.info("SQL Server tables created")
+
+            # Seed default admin user
+            import bcrypt
+            from sqlalchemy import func as sa_func
+            admin_email = (os.getenv("ADMIN_LOGIN_EMAIL") or "admin").strip().lower()
+            admin_password = (os.getenv("ADMIN_LOGIN_PASSWORD") or "admin").strip()
+            db = SessionLocal()
+            try:
+                existing = db.query(Staff).filter(sa_func.lower(Staff.email) == admin_email).first()
+                if not existing:
+                    pw_hash = bcrypt.hashpw(admin_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+                    db.add(Staff(name="Admin", email=admin_email, password_hash=pw_hash, role="admin", status="active"))
+                    db.commit()
+                    logger.info("Default admin user seeded (email=%s)", admin_email)
+                else:
+                    logger.info("Admin user already exists (email=%s)", admin_email)
+            finally:
+                db.close()
+
+            from app.db_models import Lead
+            db = SessionLocal()
+            try:
+                lead_count = db.query(sa_func.count(Lead.id)).scalar() or 0
+                logger.info("Startup check: database connected, %d leads in table", lead_count)
+            finally:
+                db.close()
+
+            print("Database connected")
+
+        except Exception as exc:
+            app.state.startup_status["database"] = "disconnected"
+            logger.warning("SQL Server init failed: %s", exc)
 
     logger.info("Authentication enabled")
     logger.info("Application startup complete")

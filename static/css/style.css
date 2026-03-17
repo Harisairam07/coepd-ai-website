@@ -741,6 +741,33 @@ section{ position:relative; z-index:1; margin-top:0; }
 .nc-highlight strong { color: var(--primary); }
 
 /* ─── TESTIMONIALS SLIDER (SWIPER) ─────────────────────── */
+#testimonials.section {
+  position: relative;
+  isolation: isolate;
+  background-image:
+    linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
+    url('/static/images/success-stories-bg.png?v=20260317b');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 28px;
+  overflow: hidden;
+}
+#testimonials.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)),
+    radial-gradient(circle at 16% 16%, rgba(99, 102, 241, 0.08), transparent 34%),
+    radial-gradient(circle at 84% 84%, rgba(59, 130, 246, 0.06), transparent 40%);
+}
+#testimonials.section > .container {
+  position: relative;
+  z-index: 1;
+}
 .testimonials-swiper { position: relative; overflow: hidden; }
 .testimonials-swiper .swiper-wrapper {
   align-items: stretch;
@@ -748,8 +775,11 @@ section{ position:relative; z-index:1; margin-top:0; }
 }
 .testimonial-card {
   height: auto;
-  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  background: linear-gradient(165deg, rgba(255,255,255,0.60), rgba(248,251,255,0.50));
+  border: 1px solid rgba(191, 219, 254, 0.86); border-radius: var(--radius);
   padding: 28px; box-shadow: var(--shadow); transition: all var(--duration) var(--ease);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   display: flex; flex-direction: column; gap: 14px;
 }
 .testimonial-card:hover {
@@ -807,6 +837,12 @@ section{ position:relative; z-index:1; margin-top:0; }
   background: var(--border); transition: all var(--duration) var(--ease); opacity: 1;
 }
 .carousel-dots .swiper-pagination-bullet-active { background: var(--primary); width: 28px; }
+
+@media (max-width: 768px) {
+  #testimonials.section {
+    border-radius: 18px;
+  }
+}
 
 /* ─── HIRING PARTNERS ──────────────────────────────────── */
 .hiring-logos-grid {
@@ -1654,6 +1690,39 @@ section{ position:relative; z-index:1; margin-top:0; }
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
 }
+#benefits.section {
+  position: relative;
+  isolation: isolate;
+  background-image:
+    linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
+    url('/static/images/benefits-bg.png?v=20260317b');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 28px;
+  overflow: hidden;
+}
+#benefits.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)),
+    radial-gradient(circle at 16% 18%, rgba(59, 130, 246, 0.07), transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(14, 165, 233, 0.06), transparent 40%);
+}
+#benefits.section > .container {
+  position: relative;
+  z-index: 1;
+}
+.benefit-card {
+  background: linear-gradient(165deg, rgba(255,255,255,0.60), rgba(248,251,255,0.50));
+  border: 1px solid rgba(191, 219, 254, 0.86);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
 .card-icon-wrap--benefit {
   background: var(--primary-light);
   color: var(--primary);
@@ -1668,7 +1737,6 @@ section{ position:relative; z-index:1; margin-top:0; }
 .glass-card--hostel .card-icon-wrap--benefit { background: rgba(79,70,229,.08); color: var(--primary); }
 .glass-card--discount .card-icon-wrap--benefit { background: rgba(245,158,11,.08); color: #f59e0b; }
 .benefit-card:hover .card-icon-wrap--benefit { transform: scale(1.08) rotate(-3deg); }
-<<<<<<< HEAD
 .benefit-emoji {
   display: inline-flex;
   align-items: center;
@@ -1676,13 +1744,16 @@ section{ position:relative; z-index:1; margin-top:0; }
   font-size: 24px;
   line-height: 1;
 }
-=======
->>>>>>> 11d59141a8029ea48204adb46857c682045bffa9
 .card-badge--green {
   background: rgba(34,197,94,.1); color: var(--accent-dark);
 }
 .card-badge--secondary {
   background: rgba(124,58,237,.1); color: #7c3aed;
+}
+@media (max-width: 768px) {
+  #benefits.section {
+    border-radius: 18px;
+  }
 }
 
 /* ─── TESTIMONIAL UPGRADES ──────────────────────────── */
@@ -2040,9 +2111,33 @@ section{ position:relative; z-index:1; margin-top:0; }
 
 /* Trend Section: SaaS analytics dashboard */
 .trend-section {
+  position: relative;
+  isolation: isolate;
   padding: 96px 0 72px;
   scroll-margin-top: 96px;
-  background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+  background-image:
+    linear-gradient(180deg, rgba(247, 250, 255, 0.44), rgba(239, 246, 255, 0.50)),
+    url('/static/images/market-trends-bg.png?v=20260317b');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 28px;
+  overflow: hidden;
+}
+.trend-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)),
+    radial-gradient(circle at 18% 20%, rgba(59, 130, 246, 0.07), transparent 34%),
+    radial-gradient(circle at 84% 84%, rgba(14, 165, 233, 0.06), transparent 40%);
+}
+.trend-section > .container {
+  position: relative;
+  z-index: 1;
 }
 .trends-grid {
   display: grid;
@@ -2051,16 +2146,18 @@ section{ position:relative; z-index:1; margin-top:0; }
   margin-top: 40px;
 }
 .trend-card {
-  background: #ffffff;
+  background: linear-gradient(165deg, rgba(255,255,255,0.60), rgba(248,251,255,0.50));
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e5e7eb;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+  border: 1px solid rgba(191, 219, 254, 0.86);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
   transition: transform .25s ease, box-shadow .25s ease;
 }
 .trend-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 20px 42px rgba(15, 23, 42, 0.18);
 }
 .trend-title {
   margin: 0 0 10px;
@@ -2108,6 +2205,7 @@ section{ position:relative; z-index:1; margin-top:0; }
 @media (max-width: 640px) {
   .trend-section {
     padding-top: 80px;
+    border-radius: 18px;
   }
   .trend-card {
     padding: 18px;
@@ -3047,8 +3145,35 @@ background-position:130% center;
 
 /* Tools section upgrade */
 #tools.section{
+  position: relative;
+  isolation: isolate;
   margin-top: 64px;
   padding-top: 8px;
+  background-image:
+    linear-gradient(180deg, rgba(247, 250, 255, 0.40), rgba(239, 246, 255, 0.44)),
+    url('/static/images/tools-bg.png?v=20260317');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+#tools.section::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)),
+    radial-gradient(circle at 20% 14%, rgba(59, 130, 246, 0.07), transparent 36%),
+    radial-gradient(circle at 82% 84%, rgba(14, 165, 233, 0.06), transparent 40%);
+}
+
+#tools.section > .container{
+  position: relative;
+  z-index: 1;
 }
 
 #tools .container{
@@ -3057,6 +3182,7 @@ background-position:130% center;
 
 #tools .section-header{
   margin-bottom: 28px;
+  text-align: center;
 }
 
 #tools .section-header h2{
@@ -3064,13 +3190,16 @@ background-position:130% center;
   font-weight: 800;
   letter-spacing: -0.03em;
   color: #0f172a;
+  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.55);
 }
 
 #tools .section-desc{
   max-width: 760px;
+  margin: 0 auto;
   font-size: 17px;
   line-height: 1.7;
-  color: #475569;
+  color: #334155;
+  text-shadow: 0 1px 10px rgba(255, 255, 255, 0.45);
 }
 
 #tools .tools-grid{
@@ -3082,10 +3211,12 @@ background-position:130% center;
 #tools .tool-card{
   position: relative;
   padding: 30px 22px 26px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid rgba(191, 219, 254, 0.85);
   border-radius: 18px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  background: linear-gradient(165deg, rgba(255,255,255,0.56), rgba(248,250,252,0.46));
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
   transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
 }
 
@@ -3095,15 +3226,15 @@ background-position:130% center;
   inset: 0;
   border-radius: 18px;
   pointer-events: none;
-  background: linear-gradient(145deg, rgba(59, 130, 246, 0.08), rgba(16, 185, 129, 0.04));
+  background: linear-gradient(145deg, rgba(59, 130, 246, 0.14), rgba(16, 185, 129, 0.08));
   opacity: 0;
   transition: opacity .28s ease;
 }
 
 #tools .tool-card:hover{
   transform: translateY(-8px);
-  border-color: #c7d2fe;
-  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.14);
+  border-color: rgba(147, 197, 253, 0.95);
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18);
 }
 
 #tools .tool-card:hover::after{
@@ -3115,7 +3246,8 @@ background-position:130% center;
   height: 66px;
   margin: 0 auto 14px;
   border-radius: 16px;
-  background: #eef2ff;
+  background: linear-gradient(180deg, rgba(238,242,255,0.92), rgba(219,234,254,0.78));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
 }
 
 #tools .tool-icon svg{
@@ -3146,6 +3278,7 @@ background-position:130% center;
 @media (max-width: 768px){
   #tools.section{
     margin-top: 44px;
+    border-radius: 18px;
   }
 
   #tools .tools-grid{
@@ -3168,7 +3301,34 @@ background-position:130% center;
 
 /* Curriculum section upgrade */
 #curriculum.section{
+  position: relative;
+  isolation: isolate;
   margin-top: 56px;
+  background-image:
+    linear-gradient(180deg, rgba(247, 250, 255, 0.42), rgba(239, 246, 255, 0.48)),
+    url('/static/images/curriculum-bg.png?v=20260317b');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+#curriculum.section::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.11), rgba(255,255,255,0.04)),
+    radial-gradient(circle at 16% 18%, rgba(59, 130, 246, 0.07), transparent 34%),
+    radial-gradient(circle at 84% 86%, rgba(14, 165, 233, 0.06), transparent 40%);
+}
+
+#curriculum.section > .container{
+  position: relative;
+  z-index: 1;
 }
 
 #curriculum .container{
@@ -3177,6 +3337,7 @@ background-position:130% center;
 
 #curriculum .section-header{
   margin-bottom: 34px;
+  text-align: center;
 }
 
 #curriculum .section-header h2{
@@ -3189,8 +3350,10 @@ background-position:130% center;
 #curriculum .section-desc{
   font-size: 20px;
   line-height: 1.7;
-  color: #475569;
+  color: #334155;
   max-width: 920px;
+  margin: 0 auto;
+  text-shadow: 0 1px 10px rgba(255,255,255,0.45);
 }
 
 #curriculum .accordion{
@@ -3199,18 +3362,20 @@ background-position:130% center;
 }
 
 #curriculum .accordion-item{
-  border: 1px solid #dbe4f4;
+  border: 1px solid rgba(191, 219, 254, 0.86);
   border-radius: 16px;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  background: linear-gradient(165deg, rgba(255,255,255,0.60), rgba(248,251,255,0.48));
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12);
   overflow: hidden;
   transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
 }
 
 #curriculum .accordion-item:hover{
   transform: translateY(-3px);
-  border-color: #c7d2fe;
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.12);
+  border-color: rgba(147, 197, 253, 0.95);
+  box-shadow: 0 22px 42px rgba(15, 23, 42, 0.16);
 }
 
 #curriculum .accordion-item summary{
@@ -3247,7 +3412,7 @@ background-position:130% center;
 
 #curriculum .accordion-item[open]{
   border-color: #a5b4fc;
-  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.16);
+  box-shadow: 0 22px 44px rgba(79, 70, 229, 0.22);
 }
 
 #curriculum .accordion-item[open] summary{
@@ -3292,6 +3457,7 @@ background-position:130% center;
 @media (max-width: 768px){
   #curriculum.section{
     margin-top: 36px;
+    border-radius: 18px;
   }
 
   #curriculum .section-desc{
@@ -3874,8 +4040,6 @@ main.page{
     width: 32px;
   }
 }
-<<<<<<< HEAD
-
 /* Hiring partners premium section upgrade */
 #hiring-partners.section {
   isolation: isolate;
@@ -4138,5 +4302,4 @@ main.page{
     min-height: 34px;
   }
 }
-=======
->>>>>>> 11d59141a8029ea48204adb46857c682045bffa9
+
